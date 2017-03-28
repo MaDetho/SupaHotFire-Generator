@@ -1,0 +1,382 @@
+{
+    "frames": [
+        {
+            "img": "loop_000.gif",
+            "cordx": 153,
+            "cordy": 91,
+            "width": 45,
+            "height": 62
+        },
+        {
+            "img": "loop_001.gif",
+            "cordx": 151,
+            "cordy": 92,
+            "width": 45,
+            "height": 62
+        },
+        {
+            "img": "loop_002.gif",
+            "cordx": 150,
+            "cordy": 92,
+            "width": 45,
+            "height": 62
+        },
+        {
+            "img": "loop_003.gif",
+            "cordx": 150,
+            "cordy": 93,
+            "width": 45,
+            "height": 62
+        },
+        {
+            "img": "loop_004.gif",
+            "cordx": 150,
+            "cordy": 93,
+            "width": 45,
+            "height": 62
+        },
+        {
+            "img": "loop_005.gif",
+            "cordx": 150,
+            "cordy": 93,
+            "width": 45,
+            "height": 62
+        },
+        {
+            "img": "loop_006.gif",
+            "cordx": 151,
+            "cordy": 93,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_007.gif",
+            "cordx": 152,
+            "cordy": 91,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_008.gif",
+            "cordx": 149,
+            "cordy": 88,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_009.gif",
+            "cordx": 149,
+            "cordy": 88,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_010.gif",
+            "cordx": 145,
+            "cordy": 88,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_011.gif",
+            "cordx": 141,
+            "cordy": 88,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_012.gif",
+            "cordx": 140,
+            "cordy": 87,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_013.gif",
+            "cordx": 138,
+            "cordy": 86,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_014.gif",
+            "cordx": 138,
+            "cordy": 86,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_015.gif",
+            "cordx": 136,
+            "cordy": 85,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_016.gif",
+            "cordx": 132,
+            "cordy": 87,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_017.gif",
+            "cordx": 132,
+            "cordy": 88,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_018.gif",
+            "cordx": 130,
+            "cordy": 87,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_019.gif",
+            "cordx": 130,
+            "cordy": 87,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_020.gif",
+            "cordx": 127,
+            "cordy": 84,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_021.gif",
+            "cordx": 124,
+            "cordy": 82,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_022.gif",
+            "cordx": 123,
+            "cordy": 81,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_023.gif",
+            "cordx": 121,
+            "cordy": 78,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_024.gif",
+            "cordx": 121,
+            "cordy": 78,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_025.gif",
+            "cordx": 119,
+            "cordy": 75,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_026.gif",
+            "cordx": 117,
+            "cordy": 71,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_027.gif",
+            "cordx": 117,
+            "cordy": 68,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_028.gif",
+            "cordx": 118,
+            "cordy": 65,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_029.gif",
+            "cordx": 118,
+            "cordy": 65,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_030.gif",
+            "cordx": 120,
+            "cordy": 61,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_031.gif",
+            "cordx": 122,
+            "cordy": 61,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_033.gif",
+            "cordx": 123,
+            "cordy": 59,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_032.gif",
+            "cordx": 123,
+            "cordy": 59,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_034.gif",
+            "cordx": 123,
+            "cordy": 59,
+            "width": 45,
+            "height": 61
+        },
+        {
+            "img": "loop_035.gif",
+            "cordx": 116,
+            "cordy": 60,
+            "width": 28,
+            "height": 61
+        },
+        {
+            "img": "loop_036.gif",
+            "cordx": 108,
+            "cordy": 61,
+            "width": 15,
+            "height": 61
+        },
+        {
+            "img": "loop_037.gif",
+            "cordx": 1,
+            "cordy": 1,
+            "width": 1,
+            "height": 1
+        },
+        {
+            "img": "loop_038.gif",
+            "cordx": 1,
+            "cordy": 1,
+            "width": 1,
+            "height": 1
+        },
+        {
+            "img": "loop_039.gif",
+            "cordx": 1,
+            "cordy": 1,
+            "width": 1,
+            "height": 1
+        },
+        {
+            "img": "loop_040.gif",
+            "cordx": 1,
+            "cordy": 1,
+            "width": 1,
+            "height": 1
+        },
+        {
+            "img": "loop_041.gif",
+            "cordx": 1,
+            "cordy": 1,
+            "width": 1,
+            "height": 1
+        },
+        {
+            "img": "loop_042.gif",
+            "cordx": 139,
+            "cordy": 61,
+            "width": 42,
+            "height": 24
+        },
+        {
+            "img": "loop_043.gif",
+            "cordx": 139,
+            "cordy": 61,
+            "width": 42,
+            "height": 24
+        },
+        {
+            "img": "loop_044.gif",
+            "cordx": 139,
+            "cordy": 61,
+            "width": 42,
+            "height": 24
+        },
+        {
+            "img": "loop_045.gif",
+            "cordx": 141,
+            "cordy": 61,
+            "width": 41,
+            "height": 25
+        },
+        {
+            "img": "loop_046.gif",
+            "cordx": 149,
+            "cordy": 82,
+            "width": 49,
+            "height": 63
+        },
+        {
+            "img": "loop_047.gif",
+            "cordx": 149,
+            "cordy": 82,
+            "width": 49,
+            "height": 63
+        },
+        {
+            "img": "loop_048.gif",
+            "cordx": 154,
+            "cordy": 82,
+            "width": 49,
+            "height": 63
+        },
+        {
+            "img": "loop_049.gif",
+            "cordx": 158,
+            "cordy": 84,
+            "width": 49,
+            "height": 63
+        },
+        {
+            "img": "loop_050.gif",
+            "cordx": 160,
+            "cordy": 87,
+            "width": 49,
+            "height": 63
+        },
+        {
+            "img": "loop_051.gif",
+            "cordx": 159,
+            "cordy": 88,
+            "width": 49,
+            "height": 63
+        },
+        {
+            "img": "loop_052.gif",
+            "cordx": 157,
+            "cordy": 83,
+            "width": 47,
+            "height": 62
+        },
+        {
+            "img": "loop_053.gif",
+            "cordx": 153,
+            "cordy": 83,
+            "width": 46,
+            "height": 61
+        }
+    ]
+}
