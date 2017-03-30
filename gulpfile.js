@@ -1,13 +1,14 @@
-var gulp            = require('gulp');
-var browserSync     = require('browser-sync').create();
-var sass            = require('gulp-sass');
-var autoprefixer    = require('gulp-autoprefixer');
+var gulp = require('gulp');
+var browserSync = require('browser-sync').create();
+var sass = require('gulp-sass');
+var autoprefixer = require('gulp-autoprefixer');
+var nodemon = require('gulp-nodemon');
 
-gulp.task('serve', ['sass'], function() {
+gulp.task('serve', ['sass'], function () {
 
     browserSync.init({
         ghostMode: false,
-		notify: false,
+        notify: false,
         proxy: "http://localhost:8085"
     });
 
@@ -16,12 +17,21 @@ gulp.task('serve', ['sass'], function() {
     gulp.watch('public/*.html').on('change', browserSync.reload);
 });
 
-gulp.task('sass', function() {
+gulp.task('sass', function () {
     return gulp.src('public/scss/style.scss')
-        .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
-        .pipe(autoprefixer({browsers: ['last 2 versions']}))
+        .pipe(sass({ outputStyle: 'compressed' }).on('error', sass.logError))
+        .pipe(autoprefixer({ browsers: ['last 2 versions'] }))
         .pipe(gulp.dest('public/css'))
         .pipe(browserSync.stream());
 });
 
-gulp.task('default', ['serve']);
+gulp.task('start', function () {
+    nodemon({
+        exec: 'node --debug',
+        script: 'start.js',
+        ext: 'js html',
+        env: { 'NODE_ENV': 'development' }
+    })
+})
+
+gulp.task('default', ['start', 'serve']);
