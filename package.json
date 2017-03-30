@@ -8,11 +8,21 @@
   },
   "author": "MaDetho & ccarlsen",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MaDetho/SupaHotFire-Generator.git"
+  },
   "dependencies": {
     "body-parser": "^1.16.0",
     "express": "^4.14.1",
     "gm": "*",
     "lodash": "*",
     "request": "*"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.18.8",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-sass": "^3.1.0"
   }
 }
