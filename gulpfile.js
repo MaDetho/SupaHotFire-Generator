@@ -6,9 +6,9 @@ var autoprefixer    = require('gulp-autoprefixer');
 gulp.task('serve', ['sass'], function() {
 
     browserSync.init({
-        server: 'public',
         ghostMode: false,
-		notify: false
+		notify: false,
+        proxy: "http://localhost:8085"
     });
 
     gulp.watch('public/scss/*.scss', ['sass']);
