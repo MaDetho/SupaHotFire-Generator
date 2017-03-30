@@ -29,7 +29,8 @@ gulp.task('start', function () {
     nodemon({
         exec: 'node --debug',
         script: 'start.js',
-        ext: 'js html',
+        ext: 'js',
+        ignore: ['public/'],
         env: { 'NODE_ENV': 'development' }
     })
 })
