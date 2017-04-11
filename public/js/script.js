@@ -5,7 +5,8 @@ $("#gifgen").submit(function (event) {
         url: '/face',
         data: {
             'faceurl': $('#faceurl').val(),
-            'resize': $('#resize').val()
+            'resize': $('#resize').val(),
+            'caption': $('#caption').val()
         },
         success: function (filename) {
             $('#gif').html('<img src="/'+filename+'"/>');

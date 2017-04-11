@@ -27,7 +27,7 @@ app.get('/png', function (request, response, next) {
 
 app.post('/face', function (request, response, next) {
 	var resizedFactor = 0;
-	if(request.body.resize) {
+	if (request.body.resize) {
 		resizedFactor = request.body.resize;
 	}
 	var currentMillis = (new Date).getTime();
@@ -36,18 +36,18 @@ app.post('/face', function (request, response, next) {
 		.on('error', function (err) {
 			console.log(err)
 		}).pipe(fs.createWriteStream(filename)
-		.on('finish', function () {
-			buildFrames(filename, currentMillis, supaJson, resizedFactor, function (gifFilename) {
-				response.status(200).send(gifFilename);
-			});
-		}));
+			.on('finish', function () {
+				buildFrames(filename, currentMillis, supaJson, resizedFactor, request.body.caption, function (gifFilename) {
+					response.status(200).send(gifFilename);
+				});
+			}));
 });
 
-var buildFrames = function (faceFilename, currentMillis, jsonFrames, resizePercentage, callback) {
+var buildFrames = function (faceFilename, currentMillis, jsonFrames, resizePercentage, caption, callback) {
 	var count = 0;
 	var zeros = '000';
 	var framesCount = Object.keys(jsonFrames.frames).length;
-	var frameFinished = _.after(framesCount, function() { return buildLoop(currentMillis, callback) });
+	var frameFinished = _.after(framesCount, function () { return buildLoop(currentMillis, callback) });
 	var tempJson = {};
 	tempJson.frames = [];
 	for (var frame of jsonFrames.frames) {
@@ -62,7 +62,17 @@ var buildFrames = function (faceFilename, currentMillis, jsonFrames, resizePerce
 			zeros = '0'
 		}
 		var cordinates = cordx + ',' + cordy + ' ' + resizedWidth + ',' + resizedHeight;
-		gm('imgs/' + frame.img).draw(['image Over ' + cordinates + ' ' + faceFilename]).write('./edit/supa_' + zeros + '' + count + '.gif', function (err) {
+		var fontSizeTwoLines = 20;
+		var faceImage = gm('imgs/' + frame.img).draw(['image Over ' + cordinates + ' ' + faceFilename]);
+		if (caption) {
+			faceImage = faceImage.background('black')
+				.fill('white')
+				.fontSize(fontSizeTwoLines)
+				.gravity('South')
+				.extent(0, 315)
+				.drawText(0, (caption.length > 24 ? 10 : 25), stringDivider(caption, 24, '\n'), 'North');
+		}
+		faceImage.write('./edit/supa_' + zeros + '' + count + '.gif', function (err) {
 			if (err) console.log(err);
 			frameFinished();
 		});
@@ -71,11 +81,25 @@ var buildFrames = function (faceFilename, currentMillis, jsonFrames, resizePerce
 
 var buildLoop = function (currentMillis, callback) {
 	var gifFilename = currentMillis + '.gif';
-	gm('edit/*.gif').delay(4).loop('0').write('./public/'+currentMillis+'.gif', function (err) {
+	gm('edit/*.gif').delay(4).loop('0').write('./public/' + currentMillis + '.gif', function (err) {
 		if (err) console.log(err);
 		console.log('done');
 		callback(gifFilename);
 	});
+}
+
+var stringDivider = function (str, width, spaceReplacer) {
+	if (str.length > width) {
+		var p = width
+		for (; p > 0 && str[p] != ' '; p--) {
+		}
+		if (p > 0) {
+			var left = str.substring(0, p);
+			var right = str.substring(p + 1);
+			return left + spaceReplacer + stringDivider(right, width, spaceReplacer);
+		}
+	}
+	return str;
 }
 
 
