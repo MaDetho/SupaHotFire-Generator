@@ -4,3 +4,5 @@ node_modules
 faces
 edit
 *.gif
+
+package-lock\.json
