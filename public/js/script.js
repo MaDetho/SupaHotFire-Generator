@@ -1,6 +1,8 @@
 $("#gifgen").submit(function (event) {
     event.preventDefault();
+    $('#gif').html('Loading...');
     $.ajax({
+        dataType: "json",
         type: 'POST',
         url: '/face',
         data: {
@@ -8,8 +10,12 @@ $("#gifgen").submit(function (event) {
             'resize': $('#resize').val(),
             'caption': $('#caption').val()
         },
-        success: function (filename) {
-            $('#gif').html('<img src="/'+filename+'"/>');
+        success: function (data) {
+            $('#gif').html('<img src="/'+data.filename+'"/>');
+        },
+        error: function (data) {
+            console.log(data);
+            $('#gif').html(data.responseJSON.message);
         }
     });
 });

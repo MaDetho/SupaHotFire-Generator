@@ -27,7 +27,7 @@ gulp.task('sass', function () {
 
 gulp.task('start', function () {
     nodemon({
-        exec: 'node --debug',
+        exec: 'node --inspect',
         script: 'start.js',
         ext: 'js',
         ignore: ['public/'],

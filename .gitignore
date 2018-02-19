@@ -6,3 +6,5 @@ edit
 *.gif
 
 package-lock\.json
+
+*.lock
