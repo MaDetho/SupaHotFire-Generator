@@ -6,6 +6,7 @@ let _ = require('lodash');
 let req = require('request');
 let fs = require('fs');
 let supaJson = require('./test.json');
+const validUrl = require('valid-url');
 let imWorking = false;
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -32,8 +33,11 @@ app.post('/face', function (request, response, next) {
 
 	//Check required Params
 	if(!faceUrl || !resizedFactor) {
-		response.status(400).send({"message":"Missing body params..."});
-		return;
+		return response.status(400).send({"message":"Missing body params..."});
+	}
+
+	if(!validUrl.isUri(faceUrl)) {
+		return response.status(501).send({"message":"Invalid face uri"});
 	}
 
 	//Check if im Working...
