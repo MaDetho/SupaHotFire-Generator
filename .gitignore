@@ -8,3 +8,5 @@ edit
 package-lock\.json
 
 *.lock
+
+public/template/*

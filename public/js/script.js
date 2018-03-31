@@ -8,7 +8,8 @@ $("#gifgen").submit(function (event) {
         data: {
             'faceurl': $('#faceurl').val(),
             'resize': $('#resize').val(),
-            'caption': $('#caption').val()
+            'caption': $('#caption').val(),
+            'gifid': $('#templates').find(":selected").data('gifid')
         },
         success: function (data) {
             $('#gif').html('<img src="/'+data.filename+'"/>');

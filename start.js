@@ -1,28 +1,50 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const gm = require('gm').subClass({ imageMagick: true });
-let _ = require('lodash');
-let req = require('request');
-let fs = require('fs');
-let supaJson = require('./test.json');
+const gm = require('gm');
+const _ = require('lodash');
+const req = require('request');
+const fs = require('fs');
+const supaJson = require('./test.json');
 const validUrl = require('valid-url');
+const mongo = require('./db');
+const path = require('path');
 let imWorking = false;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 
-app.post('/supa', function (request, response, next) {
-	let supaHot = {};
-	supaHot.message = "<img src='http://www.reactiongifs.com/r/2013/06/supa-hot-fire.gif' />";
-	supaHot.message_format = 'html'
-	response.send(supaHot);
+app.post('/split', function (request, response, next) {
+	response.setHeader('Content-Type', 'application/json');
+	let currentMillis = (new Date).getTime();
+	let templateDir = '/template/' + currentMillis;
+	let saveDir = './public' + templateDir;
+	fs.mkdirSync(saveDir);
+	gm(req(request.body.url)).coalesce().out('+adjoin').write(saveDir + '/' + currentMillis + '_%03d.png', function (err) {
+		if (err) console.log(err);
+		fs.readdir(saveDir, (err, files) => {
+			let reponseJson = {};
+			gm(saveDir + '/' + files[0])
+				.size(function (err, size) {
+					if (!err)
+						response.status(200).send({ width: size.width, height: size.height, urlPrefix: templateDir, gifid: currentMillis, files: files });
+				});
+		})
+	});
 });
 
-app.get('/png', function (request, response, next) {
-	gm('supa.gif').coalesce().write('./imgs/loop_%03d.gif', function (err) {
-		if (err) console.log(err);
+app.post('/new', function (request, response, next) {
+	response.setHeader('Content-Type', 'application/json');
+	mongo.createNewTemplate(request.body, () => {
+		return response.status(200).send({});
+	});
+});
+
+app.get('/templates', function (request, response, next) {
+	response.setHeader('Content-Type', 'application/json');
+	mongo.getAllTemplates((templates) => {
+		return response.status(200).send(templates);
 	});
 });
 
@@ -30,60 +52,78 @@ app.post('/face', function (request, response, next) {
 	response.setHeader('Content-Type', 'application/json');
 	let faceUrl = request.body.faceurl;
 	let resizedFactor = request.body.resize;
+	let templateId = request.body.gifid;
 
 	//Check required Params
-	if(!faceUrl || !resizedFactor) {
-		return response.status(400).send({"message":"Missing body params..."});
+	if (!faceUrl || !resizedFactor) {
+		return response.status(400).send({ "message": "Missing body params..." });
 	}
 
-	if(!validUrl.isUri(faceUrl)) {
-		return response.status(501).send({"message":"Invalid face uri"});
+	if (!validUrl.isUri(faceUrl)) {
+		return response.status(501).send({ "message": "Invalid face uri" });
 	}
 
 	//Check if im Working...
-	if(imWorking) {
-		response.status(503).send({"message":"Worker is doing shit, try again later..."});
+	if (imWorking) {
+		response.status(503).send({ "message": "Worker is doing shit, try again later..." });
 		return;
 	}
-	
-	imWorking = true;
-	let currentMillis = (new Date).getTime();
-	let filename = 'faces/' + currentMillis + '.' + faceUrl.split('.').pop();
-	req.get(faceUrl)
-		.on('error', function (err) {
-			imWorking = false;
-			console.log(err)
-		}).pipe(fs.createWriteStream(filename)
-			.on('finish', function () {
-				buildFrames(filename, currentMillis, supaJson, resizedFactor, request.body.caption, function (gifFilename) {
-					imWorking = false;
-					response.status(200).send({"filename": gifFilename});
-					return;
-				});
-			}));
+
+	mongo.getTemplate(templateId, (template) => {
+		imWorking = true;
+		let currentMillis = (new Date).getTime();
+		let filename = 'faces/' + currentMillis + '.' + faceUrl.split('.').pop();
+		req.get(faceUrl)
+			.on('error', function (err) {
+				imWorking = false;
+				console.log(err)
+			}).pipe(fs.createWriteStream(filename)
+				.on('finish', function () {
+					buildFrames(filename, currentMillis, template, resizedFactor, request.body.caption, function (gifFilename) {
+						imWorking = false;
+						response.status(200).send({ "filename": gifFilename });
+
+						fs.readdir('./edit', (err, files) => {
+							if (err) throw err;
+
+							for (const file of files) {
+								fs.unlink(path.join('./edit', file), err => {
+									if (err) throw err;
+								});
+							}
+						});
+					});
+				}));
+	});
 });
 
 let buildFrames = function (faceFilename, currentMillis, jsonFrames, resizePercentage, caption, callback) {
 	let count = 0;
 	let zeros = '000';
-	let framesCount = Object.keys(jsonFrames.frames).length;
+	let framesCount = jsonFrames.frames.length;
 	let frameFinished = _.after(framesCount, function () { return buildLoop(currentMillis, callback) });
 	let tempJson = {};
 	tempJson.frames = [];
 	for (let frame of jsonFrames.frames) {
-		let resizedWidth = (frame.width / 100) * resizePercentage + frame.width;
-		let resizedHeight = (frame.height / 100) * resizePercentage + frame.height;
-		let cordx = frame.cordx - Math.ceil((resizedWidth / 2));
-		let cordy = frame.cordy - Math.ceil((resizedHeight / 2));
+		let width = frame.width;
+		let height = frame.height;
+		let top = frame.top;
+		let left = frame.left;
+		let angle = frame.angle;
+
+		let resizedWidth = (width / 100) * resizePercentage + width;
+		let resizedHeight = (height / 100) * resizePercentage + height;
+		top = top - (((width / 100) * resizePercentage) / 2);
+		left = left - (((height / 100) * resizePercentage) / 2);
 		count++;
 		if (count < 10) {
 			zeros = '00';
 		} else {
 			zeros = '0'
 		}
-		let cordinates = cordx + ',' + cordy + ' ' + resizedWidth + ',' + resizedHeight;
+		let cordinates = left + ',' + top + ' ' + resizedWidth + ',' + resizedHeight;
 		let fontSizeTwoLines = 20;
-		let faceImage = gm('imgs/' + frame.img).draw(['image Over ' + cordinates + ' ' + faceFilename]);
+		let faceImage = gm('public/template/' + jsonFrames.gifid + "/" + frame.filename).draw(['image Over ' + cordinates + ' ' + faceFilename]);
 		if (caption) {
 			faceImage = faceImage.background('black')
 				.fill('white')
@@ -99,15 +139,15 @@ let buildFrames = function (faceFilename, currentMillis, jsonFrames, resizePerce
 	}
 }
 
-let buildLoop = function (currentMillis, callback) {
+buildLoop = function (currentMillis, callback) {
 	let gifFilename = currentMillis + '.gif';
-	gm('edit/*.gif').delay(4).loop('0').write('./public/' + currentMillis + '.gif', function (err) {
+	gm('edit/*.gif').delay(4).loop('0').write('./public/' + gifFilename, function (err) {
 		if (err) console.log(err);
 		callback(gifFilename);
 	});
 }
 
-let stringDivider = function (str, width, spaceReplacer) {
+stringDivider = function (str, width, spaceReplacer) {
 	if (str.length > width) {
 		let p = width
 		for (; p > 0 && str[p] != ' '; p--) {

@@ -1,29 +1,182 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="x-ua-compatible" content="ie=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Supa Hot Fire Generator</title>
-	<link href="css/style.css" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Supa Hot Fire Generator</title>
+    <link href="css/style.css" rel="stylesheet">
 </head>
+
 <body>
 
     <form id="gifgen">
-        Face Image URL:<br>
+        Template:
+        <br>
+        <select id="templates">
+        </select>
+        <br> Face Image URL:
+        <br>
         <input type="text" id="faceurl">
-        <br> Face Resize Percentage:<br>
+        <br> Face Resize Percentage:
+        <br>
         <input type="text" id="resize" value="0">
-        <br> Caption (47 chars):<br>
-        <input type="text" id="caption">
-        <br><br>
+        <br> Caption (47 chars):
+        <br>
+        <input type="text" id="caption" disabled>
+        <br>
+        <br>
         <input type="submit" value="Submit">
     </form>
 
     <div id="gif"></div>
 
-	<script src="js/jquery.js"></script>
+
+    <h1>Generate new template</h1>
+    1. Load GIF-URL:
+    <input type="text" id="gifurl">
+    <button class="btn">Load</button>
+    <br>2. Set current frame template coordinates and load next frame
+    <button class="next" disabled>Set</button>
+    <br>3. Set a Template-name and save it
+    <input type="text" id="name">
+    <button class="save" disabled>Save</button>
+    
+    <div class="frames"></div>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/fabric.min.js"></script>
     <script src="js/script.js"></script>
 
+    <script>
+        let frameNum = 0;
+        let frameJson = {};
+        let frames = [];
+        let templateFiles = {};
+        let templateJson = {};
+
+        //Load Templates
+        $.ajax({
+            dataType: "json",
+            type: 'GET',
+            url: '/templates',
+            success: function (data) {
+                data.forEach(template => {
+                    $('#templates').append('<option value="' + template.name + '" data-gifid="' + template.gifid + '">' + template.name + '</option>');
+                });
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+
+        //Load Frames
+        $('.btn').click(() => {
+            $.ajax({
+                dataType: "json",
+                type: 'POST',
+                url: '/split',
+                data: {
+                    'url': $('#gifurl').val()
+                },
+                success: function (data) {
+                    templateFiles = data;
+                    frameNum = 0;
+                    frames = [];
+                    loadFrame(frameNum);
+                    $(".next").prop("disabled", false);
+                    $(".save").prop("disabled", true);
+                },
+                error: function (data) {
+                    console.log(data);
+                    $('#gif').html(data.responseJSON.message);
+                }
+            });
+        });
+
+        //Set Frame data and load next frame
+        $('.next').click(() => {
+            frames.push(new frame(frameJson));
+            $('.frames').empty();
+            if ((frameNum + 1) === templateFiles.files.length) {
+                $(".save").prop("disabled", false);
+            } else {
+                loadFrame(++frameNum);
+            }
+        });
+
+        $('.save').click(() => {
+            if (!$('#name').val()) {
+                alert("please set a template name!");
+                return;
+            }
+            templateJson.name = $('#name').val();
+            templateJson.gifid = templateFiles.gifid;
+            templateJson.frames = frames;
+
+            $.ajax({
+                contentType: "application/json",
+                type: 'POST',
+                url: '/new',
+                data: JSON.stringify(templateJson),
+                success: function (data) {
+                    alert("Done. reload page");
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+        });
+
+        loadFrame = (frameId) => {
+            frameJson.id = "id-" + frameId;
+            frameJson.filename = templateFiles.files[frameId];
+            $('.frames').append("<canvas id='" + frameJson.id + "' width=" + templateFiles.width + " height=" + templateFiles.height + "></canvas>");
+            $('.frames').append("<div id='" + frameJson.id + "-info'></div>");
+            $('.frames').append("<div id='" + frameJson.id + "-count'>" + (frameNum + 1) + "/" + templateFiles.files.length + "</div>");
+            var canvas = new fabric.Canvas(frameJson.id);
+
+            fabric.Image.fromURL(templateFiles.urlPrefix + '/' + frameJson.filename, (bg) => {
+                canvas.setBackgroundImage(bg, canvas.renderAll.bind(canvas), {
+                    scaleX: canvas.width / bg.width,
+                    scaleY: canvas.height / bg.height
+                });
+            });
+
+            fabric.Image.fromURL('default.png', (img) => {
+                img.opacity = 0.8;
+                img.id = "img-" + frameId;
+                img.top = frameJson.top ? frameJson.top : 0;
+                img.left = frameJson.left ? frameJson.left : 0;
+                img.scaleX = frameJson.scaleX ? frameJson.scaleX : 1;
+                img.scaleY = frameJson.scaleY ? frameJson.scaleY : 1;
+                canvas.add(img);
+                img.on('mouseup', (obj) => {
+                    frameJson.top = obj.target.top;
+                    frameJson.left = obj.target.left
+                    frameJson.scaleX = obj.target.scaleX;
+                    frameJson.scaleY = obj.target.scaleY;
+                    frameJson.width = obj.target.width * obj.target.scaleX;
+                    frameJson.height = obj.target.height * obj.target.scaleY;
+                    frameJson.angle = obj.target.angle
+                    $('#' + frameJson.id + "-info").html(JSON.stringify(frameJson));
+                });
+            });
+        }
+
+        function frame(frameJson) {
+            this.id = frameJson.id;
+            this.filename = frameJson.filename;
+            this.top = frameJson.top;
+            this.left = frameJson.left;
+            this.width = frameJson.width;
+            this.height = frameJson.height;
+            this.angle = frameJson.angle;
+        }
+
+    </script>
+
 </body>
+
 </html>
