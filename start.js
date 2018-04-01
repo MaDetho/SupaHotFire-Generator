@@ -17,7 +17,7 @@ app.use(express.static(__dirname + '/public'));
 
 app.post('/split', function (request, response, next) {
 	response.setHeader('Content-Type', 'application/json');
-	let currentMillis = (new Date).getTime();
+	let currentMillis = (new Date()).getTime();
 	let templateDir = '/template/' + currentMillis;
 	let saveDir = './public' + templateDir;
 	fs.mkdirSync(saveDir);
@@ -30,7 +30,7 @@ app.post('/split', function (request, response, next) {
 					if (!err)
 						response.status(200).send({ width: size.width, height: size.height, urlPrefix: templateDir, gifid: currentMillis, files: files });
 				});
-		})
+		});
 	});
 });
 
@@ -71,12 +71,12 @@ app.post('/face', function (request, response, next) {
 
 	mongo.getTemplate(templateId, (template) => {
 		imWorking = true;
-		let currentMillis = (new Date).getTime();
+		let currentMillis = (new Date()).getTime();
 		let filename = 'faces/' + currentMillis + '.' + faceUrl.split('.').pop();
 		req.get(faceUrl)
 			.on('error', function (err) {
 				imWorking = false;
-				console.log(err)
+				console.log(err);
 			}).pipe(fs.createWriteStream(filename)
 				.on('finish', function () {
 					buildFrames(filename, currentMillis, template, resizedFactor, request.body.caption, function (gifFilename) {
@@ -99,28 +99,21 @@ app.post('/face', function (request, response, next) {
 
 let buildFrames = function (faceFilename, currentMillis, jsonFrames, resizePercentage, caption, callback) {
 	let count = 0;
-	let zeros = '000';
 	let framesCount = jsonFrames.frames.length;
-	let frameFinished = _.after(framesCount, function () { return buildLoop(currentMillis, callback) });
+	let frameFinished = _.after(framesCount, function () { return buildLoop(currentMillis, callback); });
 	let tempJson = {};
 	tempJson.frames = [];
 	for (let frame of jsonFrames.frames) {
+		count++;
 		let width = frame.width;
 		let height = frame.height;
 		let top = frame.top;
 		let left = frame.left;
 		let angle = frame.angle;
-
 		let resizedWidth = (width / 100) * resizePercentage + width;
 		let resizedHeight = (height / 100) * resizePercentage + height;
 		top = top - (((width / 100) * resizePercentage) / 2);
 		left = left - (((height / 100) * resizePercentage) / 2);
-		count++;
-		if (count < 10) {
-			zeros = '00';
-		} else {
-			zeros = '0'
-		}
 		let cordinates = left + ',' + top + ' ' + resizedWidth + ',' + resizedHeight;
 		let fontSizeTwoLines = 20;
 		let faceImage = gm('public/template/' + jsonFrames.gifid + "/" + frame.filename).draw(['image Over ' + cordinates + ' ' + faceFilename]);
@@ -132,22 +125,22 @@ let buildFrames = function (faceFilename, currentMillis, jsonFrames, resizePerce
 				.extent(0, 315)
 				.drawText(0, (caption.length > 24 ? 10 : 25), stringDivider(caption, 24, '\n'), 'North');
 		}
-		faceImage.write('./edit/supa_' + zeros + '' + count + '.gif', function (err) {
+		faceImage.write('./edit/edited_' + zeroPrefix(count) + '.png', function (err) {
 			if (err) console.log(err);
 			frameFinished();
 		});
 	}
 }
 
-buildLoop = function (currentMillis, callback) {
+buildLoop = (currentMillis, callback) => {
 	let gifFilename = currentMillis + '.gif';
-	gm('edit/*.gif').delay(4).loop('0').write('./public/' + gifFilename, function (err) {
+	gm('edit/edited_*.png').delay(4).loop('0').write('./public/' + gifFilename, function (err) {
 		if (err) console.log(err);
 		callback(gifFilename);
 	});
 }
 
-stringDivider = function (str, width, spaceReplacer) {
+stringDivider = (str, width, spaceReplacer) => {
 	if (str.length > width) {
 		let p = width
 		for (; p > 0 && str[p] != ' '; p--) {
@@ -159,6 +152,16 @@ stringDivider = function (str, width, spaceReplacer) {
 		}
 	}
 	return str;
+}
+
+zeroPrefix = (count) => {
+	if (count < 10) {
+		return '000' + count;
+	} else if (count < 100) {
+		return '00' + count;
+	} else {
+		return '0' + count;
+	}
 }
 
 
