@@ -11,7 +11,7 @@
 
 <body>
     <h1>Template image:</h1>
-    <img class="preview" src="" />
+    <img class="preview" height="240" src="" />
 
     <form id="gifgen">
         Template:
@@ -84,7 +84,6 @@
                 url: '/templates/' + gifid,
                 success: function (data) {
                     $('.preview').attr('src', '/template/' + gifid + '/' + data[0].frames[0].filename);
-                    console.log('/template/' + gifid + '/' + data[0].frames[0].filename);
                 },
                 error: function (data) {
                     console.log(data);
