@@ -10,6 +10,8 @@
 </head>
 
 <body>
+    <h1>Template image:</h1>
+    <img class="preview" src="" />
 
     <form id="gifgen">
         Template:
@@ -42,7 +44,7 @@
     <br>3. Set a Template-name and save it
     <input type="text" id="name">
     <button class="save" disabled>Save</button>
-    
+
     <div class="frames"></div>
 
     <script src="js/jquery.js"></script>
@@ -70,6 +72,23 @@
                 console.log(data);
             }
         });
+
+        $("#templates").change(() => {
+            let gifid = $('#templates').find(":selected").data('gifid');
+            $.ajax({
+                dataType: "json",
+                type: 'GET',
+                url: '/templates/' + gifid,
+                success: function (data) {
+                    $('.preview').attr('src', '/template/' + gifid + '/' + data[0].frames[0].filename);
+                    console.log('/template/' + gifid + '/' + data[0].frames[0].filename);
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+        });
+
 
         //Load Frames
         $('.btn').click(() => {

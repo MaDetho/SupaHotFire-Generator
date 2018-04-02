@@ -49,6 +49,14 @@ app.get('/templates', function (request, response, next) {
 	});
 });
 
+app.get('/templates/:gifid', function (request, response, next) {
+	response.setHeader('Content-Type', 'application/json');
+	let gifid = request.params.gifid;
+	mongo.getPreviewFrame(gifid, (frame) => {
+		return response.status(200).send(frame);
+	});
+});
+
 app.post('/face', function (request, response, next) {
 	response.setHeader('Content-Type', 'application/json');
 	let faceUrl = request.body.faceurl;

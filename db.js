@@ -77,6 +77,18 @@ exports.getAllTemplates = function (callback) {
     });
 }
 
+exports.getPreviewFrame = function (gifid, callback) {
+    mongoTemplate.find({'gifid': gifid}).select('frames').populate({
+        path:'frames',
+        options: {
+            limit: 1
+        }
+        }).exec(function (err, templates) {
+        if (err) return handleError(err);
+        callback(templates)
+    });
+}
+
 exports.getTemplate = function (gifid, callback) {
     mongoTemplate.findOne({'gifid': gifid}).sort({ 'name': -1 }).populate('frames').exec(function (err, template) {
         if (err) return handleError(err);
