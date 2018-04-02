@@ -62,6 +62,7 @@ app.post('/face', function (request, response, next) {
 	let faceUrl = request.body.faceurl;
 	let resizedFactor = request.body.resize;
 	let templateId = request.body.gifid;
+	let delayms = request.body.delayms ? request.body.delayms : 4;
 
 	//Check required Params
 	if (!faceUrl || !resizedFactor) {
@@ -88,7 +89,7 @@ app.post('/face', function (request, response, next) {
 				console.log(err);
 			}).pipe(fs.createWriteStream(filename)
 				.on('finish', function () {
-					buildFrames(filename, currentMillis, template, resizedFactor, request.body.caption, function (gifFilename) {
+					buildFrames(filename, currentMillis, template, resizedFactor, request.body.caption, delayms, function (gifFilename) {
 						imWorking = false;
 						response.status(200).send({ "filename": gifFilename });
 
@@ -106,10 +107,10 @@ app.post('/face', function (request, response, next) {
 	});
 });
 
-let buildFrames = function (faceFilename, currentMillis, jsonFrames, resizePercentage, caption, callback) {
+let buildFrames = function (faceFilename, currentMillis, jsonFrames, resizePercentage, caption, delayms, callback) {
 	let count = 0;
 	let framesCount = jsonFrames.frames.length;
-	let frameFinished = _.after(framesCount, function () { return buildLoop(currentMillis, callback); });
+	let frameFinished = _.after(framesCount, function () { return buildLoop(currentMillis, delayms, callback); });
 	let tempJson = {};
 	tempJson.frames = [];
 	for (let frame of jsonFrames.frames) {
@@ -128,7 +129,7 @@ let buildFrames = function (faceFilename, currentMillis, jsonFrames, resizePerce
 		let frameImage = 'public/template/' + jsonFrames.gifid + "/" + frame.filename;
 		let editedFrameImage = './edit/edited_' + zeroPrefix(count) + '.png';
 
-		exec('convert ' + frameImage + ' \\( ' + faceFilename + ' -resize ' + resizedWidth + 'x' + resizedHeight + ' -virtual-pixel None +distort SRT 0,0,1,' + angle + ',' + left + ',' + top + ' \\) -layers flatten ' + editedFrameImage, (e, stdout, stderr) => {
+		exec('convert ' + frameImage + ' \\( ' + faceFilename + ' -resize ' + resizedWidth + 'x' + resizedHeight + ' -virtual-pixel None +distort SRT 0,0,1,' + angle + ',' + left + ',' + top + ' \\) -layers flatten -resize x240 ' + editedFrameImage, (e, stdout, stderr) => {
 			if (e instanceof Error) {
 				console.error(e);
 				throw e;
@@ -138,9 +139,9 @@ let buildFrames = function (faceFilename, currentMillis, jsonFrames, resizePerce
 	}
 }
 
-buildLoop = (currentMillis, callback) => {
+buildLoop = (currentMillis, delayms, callback) => {
 	let gifFilename = currentMillis + '.gif';
-	gm('edit/edited_*.png').delay(4).loop('0').write('./public/' + gifFilename, function (err) {
+	gm('edit/edited_*.png').delay(delayms).loop('0').write('./public/' + gifFilename, function (err) {
 		if (err) console.log(err);
 		callback(gifFilename);
 	});

@@ -9,6 +9,7 @@ $("#gifgen").submit(function (event) {
             'faceurl': $('#faceurl').val(),
             'resize': $('#resize').val(),
             'caption': $('#caption').val(),
+            'delayms': $('#delayms').val(),
             'gifid': $('#templates').find(":selected").data('gifid')
         },
         success: function (data) {
