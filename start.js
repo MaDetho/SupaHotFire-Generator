@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const gm = require('gm');
+const exec = require('child_process').exec;
 const _ = require('lodash');
 const req = require('request');
 const fs = require('fs');
@@ -116,17 +117,14 @@ let buildFrames = function (faceFilename, currentMillis, jsonFrames, resizePerce
 		left = left - (((height / 100) * resizePercentage) / 2);
 		let cordinates = left + ',' + top + ' ' + resizedWidth + ',' + resizedHeight;
 		let fontSizeTwoLines = 20;
-		let faceImage = gm('public/template/' + jsonFrames.gifid + "/" + frame.filename).draw(['image Over ' + cordinates + ' ' + faceFilename]);
-		if (caption) {
-			faceImage = faceImage.background('black')
-				.fill('white')
-				.fontSize(fontSizeTwoLines)
-				.gravity('South')
-				.extent(0, 315)
-				.drawText(0, (caption.length > 24 ? 10 : 25), stringDivider(caption, 24, '\n'), 'North');
-		}
-		faceImage.write('./edit/edited_' + zeroPrefix(count) + '.png', function (err) {
-			if (err) console.log(err);
+		let frameImage = 'public/template/' + jsonFrames.gifid + "/" + frame.filename;
+		let editedFrameImage = './edit/edited_' + zeroPrefix(count) + '.png';
+
+		exec('convert ' + frameImage + ' \\( ' + faceFilename + ' -resize ' + resizedWidth + 'x' + resizedHeight + ' -virtual-pixel None +distort SRT 0,0,1,' + angle + ',' + left + ',' + top + ' \\) -layers flatten ' + editedFrameImage, (e, stdout, stderr) => {
+			if (e instanceof Error) {
+				console.error(e);
+				throw e;
+			}
 			frameFinished();
 		});
 	}
